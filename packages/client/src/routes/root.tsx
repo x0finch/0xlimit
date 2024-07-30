@@ -3,12 +3,12 @@ import { Navbar } from "~/components/nav-bar";
 
 const Root = () => {
   return (
-    <>
+    <div className="relative flex min-h-screen flex-col bg-background">
       <Navbar />
-      <main>
+      <main className="flex-1">
         <Outlet />
       </main>
-    </>
+    </div>
   );
 };
 
