@@ -1,12 +1,11 @@
 import { ThemeProvider } from '@shadcn/components/theme-provider'
-import { Button } from '@shadcn/components/ui/button'
+import { RouterProvider } from 'react-router-dom'
+import { router } from './routes'
 
 export function App() {
   return (
     <ThemeProvider defaultTheme='dark' storageKey='shadcn-ui-theme'>
-      <div className='flex justify-center items-center'>
-        <Button>aaa</Button>
-      </div>
+      <RouterProvider router={router} />
     </ThemeProvider>
   )
 
