@@ -1,19 +1,13 @@
-import { PriceInput } from "./price-input";
+import { PriceSetter } from "./price-setter";
 import { DraftMakerProvider } from "./context";
-import { AmountSell } from "./amount-sell";
-import { AmountBuy } from "./amount-buy";
-import { CenterInvert } from "./center-invert";
+import { AmountSetter } from "./amount-setter";
 
 export const Maker = () => {
   return (
     <DraftMakerProvider>
       <div className="w-full max-w-[450px] flex flex-col items-center gap-y-1">
-        <PriceInput />
-        <div className="w-full flex flex-col items-center gap-y-1 relative">
-          <AmountSell />
-          <CenterInvert />
-          <AmountBuy />
-        </div>
+        <PriceSetter />
+        <AmountSetter />
       </div>
     </DraftMakerProvider>
   );

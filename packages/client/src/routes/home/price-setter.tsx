@@ -7,15 +7,15 @@ import { SymbolIcon, Cross2Icon } from "@radix-ui/react-icons";
 import { numbers, prices } from "~/lib";
 import { DecimalInput } from "~/components/decimal-input";
 
-export const PriceInput = () => {
+export const PriceSetter = () => {
   const { marketPrice: { baseCurrency, quoteCurrency }, setPreferPrice } = useDraftMakerContext();
   const baseTokenKey = `${baseCurrency.chainId}_${baseCurrency.address}`
   const quoteTokenKey = `${quoteCurrency.chainId}_${quoteCurrency.address}`
 
-  return <PriceInputWrapped key={`${baseTokenKey}/${quoteTokenKey}`} />
+  return <InnerPriceSetter key={`${baseTokenKey}/${quoteTokenKey}`} />
 }
 
-const PriceInputWrapped = () => {
+const InnerPriceSetter = () => {
   const { marketPrice, setPreferPrice } = useDraftMakerContext();
   const [isInvert, setIsInvert] = useState(false);
   const [inputPrice, setInputPrice] = useState<string | null>(null);
