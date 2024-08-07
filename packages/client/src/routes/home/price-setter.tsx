@@ -4,19 +4,23 @@ import { TokenBadge } from "~/components/token/token.badge";
 import { useDraftMakerContext } from "./context";
 import { useEffect, useMemo, useState } from "react";
 import { SymbolIcon, Cross2Icon } from "@radix-ui/react-icons";
-import { numbers, prices } from "~/lib";
+import { Decimal, numbers, prices } from "~/lib";
 import { DecimalInput } from "~/components/decimal-input";
+import { CurrencyAmount } from "@uniswap/sdk-core";
 
 export const PriceSetter = () => {
-  const { marketPrice: { baseCurrency, quoteCurrency }, setPreferPrice } = useDraftMakerContext();
-  const baseTokenKey = `${baseCurrency.chainId}_${baseCurrency.address}`
-  const quoteTokenKey = `${quoteCurrency.chainId}_${quoteCurrency.address}`
+  const {
+    marketPrice: { baseCurrency, quoteCurrency },
+  } = useDraftMakerContext();
+  const baseTokenKey = `${baseCurrency.chainId}_${baseCurrency.address}`;
+  const quoteTokenKey = `${quoteCurrency.chainId}_${quoteCurrency.address}`;
 
-  return <InnerPriceSetter key={`${baseTokenKey}/${quoteTokenKey}`} />
-}
+  return <InnerPriceSetter key={`${baseTokenKey}/${quoteTokenKey}`} />;
+};
 
 const InnerPriceSetter = () => {
-  const { marketPrice, setPreferPrice } = useDraftMakerContext();
+  const { marketPrice, setPreferPrice, inputAmount, setOutputAmount } =
+    useDraftMakerContext();
   const [isInvert, setIsInvert] = useState(false);
   const [inputPrice, setInputPrice] = useState<string | null>(null);
 
@@ -36,7 +40,7 @@ const InnerPriceSetter = () => {
     return price.toSignificant(6);
   }, [marketPrice, inputPrice, isInvert]);
 
-  const validatedPrice = useMemo(() => {
+  const priceNumber = useMemo(() => {
     const price = Number(displayPrice);
     if (numbers.isGTEZero(price)) {
       return price;
@@ -46,29 +50,31 @@ const InnerPriceSetter = () => {
 
   const onInvertClick = () => {
     setIsInvert((prev) => !prev);
-
-    if (inputPrice === null || validatedPrice === 0) {
-      setInputPrice(null);
-      return;
-    }
-
-    const invertedPrice = prices
-      .from(baseToken, quoteToken, validatedPrice)
-      .invert()
-      .toSignificant(6);
-
-    setInputPrice(invertedPrice);
+    setInputPrice(null);
   };
 
   useEffect(() => {
-    let price = prices.from(baseToken, quoteToken, validatedPrice);
+    let price = prices.from(baseToken, quoteToken, priceNumber);
 
     if (isInvert) {
       price = price.invert();
     }
 
-    setPreferPrice(Number(price.toSignificant(6)));
-  }, [validatedPrice]);
+    setPreferPrice(price);
+    if (inputAmount) {
+      const outputAmount = price
+        .quote(
+          CurrencyAmount.fromRawAmount(
+            price.baseCurrency,
+            Math.floor(
+              Number(inputAmount) * Math.pow(10, price.baseCurrency.decimals)
+            )
+          )
+        )
+        .toSignificant(6);
+      setOutputAmount(outputAmount as Decimal);
+    }
+  }, [priceNumber]);
 
   return (
     <Card className="w-full bg-accent p-4 rounded-2xl border-none shadow-none space-y-1 relative">
@@ -91,7 +97,7 @@ const InnerPriceSetter = () => {
         </TokenBadge>
       </div>
       <AdjustPercents
-        price={validatedPrice}
+        price={priceNumber}
         isInvert={isInvert}
         setInputPrice={setInputPrice}
       />
@@ -110,10 +116,12 @@ const InnerPriceSetter = () => {
 const AdjustPercents: React.FC<{
   isInvert: boolean;
   price: number;
-  setInputPrice: (price: string) => void;
+  setInputPrice: (price: string | null) => void;
 }> = ({ isInvert, price, setInputPrice }) => {
   const { marketPrice } = useDraftMakerContext();
-  const baseToken = isInvert ? marketPrice.quoteCurrency : marketPrice.baseCurrency;
+  const baseToken = isInvert
+    ? marketPrice.quoteCurrency
+    : marketPrice.baseCurrency;
 
   const percent = useMemo(() => {
     const transformedMarketPrice = marketPrice.baseCurrency.equals(baseToken)
@@ -128,6 +136,11 @@ const AdjustPercents: React.FC<{
   }, [baseToken, price, marketPrice]);
 
   const onPercentChange = (percent: number) => {
+    if (percent === 0) {
+      setInputPrice(null);
+      return;
+    }
+
     const transformedMarketPrice = marketPrice.baseCurrency.equals(baseToken)
       ? marketPrice
       : marketPrice.invert();
@@ -143,7 +156,7 @@ const AdjustPercents: React.FC<{
           transformedMarketPrice.quoteCurrency,
           adjustPrice
         )
-        .toSignificant()
+        .toSignificant(6)
     );
   };
 

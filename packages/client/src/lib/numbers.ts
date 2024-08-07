@@ -1,3 +1,5 @@
+export type Decimal = `${number}` | "";
+
 export const DECIMAL_PATTERN = /^[0-9]*[.,]?[0-9]*$/;
 
 export const isGTEZero = (value: number) =>

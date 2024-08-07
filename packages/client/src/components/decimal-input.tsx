@@ -3,8 +3,10 @@ import { numbers } from "~/lib";
 
 export type DecimalInputProps = Omit<
   InputProps,
-  "type" | "pattern" | "inputMode"
->;
+  "type" | "pattern" | "inputMode" | "onChange"
+> & {
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};
 
 export const DecimalInput: React.FC<DecimalInputProps> = ({
   placeholder = "0",

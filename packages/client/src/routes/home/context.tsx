@@ -1,15 +1,19 @@
 import { Price, Token } from "@uniswap/sdk-core";
 import { createContext, useContext, useState } from "react";
-import { prices } from "~/lib";
+import { Decimal, prices } from "~/lib";
 
-const DraftContext = createContext({
-  // inputToken: {} as Token,
-  // outputToken: {} as Token,
-  invert: () => { },
-  marketPrice: {} as Price<Token, Token>,
-  preferPrice: 0 as number,
-  setPreferPrice: (_value: number) => { }
-});
+type TokenPrice = Price<Token, Token>;
+
+const DraftContext = createContext<{
+  invert: () => void;
+  marketPrice: TokenPrice;
+  preferPrice: TokenPrice | null;
+  setPreferPrice: React.Dispatch<React.SetStateAction<TokenPrice | null>>;
+  inputAmount: Decimal;
+  setInputAmount: React.Dispatch<React.SetStateAction<Decimal>>;
+  outputAmount: Decimal;
+  setOutputAmount: React.Dispatch<React.SetStateAction<Decimal>>;
+}>({} as never);
 
 const INPUT_TOKEN = new Token(
   1,
@@ -23,17 +27,21 @@ const OUTPUT_TOKEN = new Token(
   6,
   "USDC"
 );
-const MARKET_PRICE = prices.from(INPUT_TOKEN, OUTPUT_TOKEN, 2506.14);
+const MARKET_PRICE = prices.from(INPUT_TOKEN, OUTPUT_TOKEN, 2516.8);
 
 export const DraftMakerProvider: React.FC<React.PropsWithChildren<unknown>> = ({
   children,
 }) => {
   const [marketPrice, setMarketPrice] = useState(MARKET_PRICE);
-  const [preferPrice, setPreferPrice] = useState(0)
+  const [preferPrice, setPreferPrice] = useState<TokenPrice | null>(null);
+  const [inputAmount, setInputAmount] = useState<Decimal>("");
+  const [outputAmount, setOutputAmount] = useState<Decimal>("");
 
   const invert = () => {
     setMarketPrice(marketPrice.invert());
-  }
+    setInputAmount(outputAmount);
+    setOutputAmount(inputAmount);
+  };
 
   return (
     <DraftContext.Provider
@@ -42,6 +50,10 @@ export const DraftMakerProvider: React.FC<React.PropsWithChildren<unknown>> = ({
         invert,
         preferPrice,
         setPreferPrice,
+        inputAmount,
+        setInputAmount,
+        outputAmount,
+        setOutputAmount,
       }}
     >
       {children}
@@ -51,4 +63,4 @@ export const DraftMakerProvider: React.FC<React.PropsWithChildren<unknown>> = ({
 
 export const useDraftMakerContext = () => {
   return useContext(DraftContext);
-}
+};
