@@ -79,7 +79,7 @@ const InnerPriceSetter = () => {
   return (
     <Card className="w-full bg-accent p-4 rounded-2xl border-none shadow-none space-y-1 relative">
       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-        <span>When 1</span>
+        <span>Prefer 1</span>
         <TokenBadge avatarSize="1rem">{baseToken}</TokenBadge>
         <span> is worth</span>
       </div>
