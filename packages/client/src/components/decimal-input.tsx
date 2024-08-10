@@ -1,5 +1,5 @@
 import { Input, InputProps } from "@shadcn/components/ui/input";
-import { numbers } from "~/lib";
+import { numbers } from "~/lib/utils";
 
 export type DecimalInputProps = Omit<
   InputProps,
@@ -38,4 +38,3 @@ export const DecimalInput: React.FC<DecimalInputProps> = ({
     />
   );
 };
-

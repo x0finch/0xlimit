@@ -4,7 +4,7 @@ import { TokenBadge } from "~/components/token/token.badge";
 import { useDraftMakerContext } from "./context";
 import { useEffect, useMemo, useState } from "react";
 import { SymbolIcon, Cross2Icon } from "@radix-ui/react-icons";
-import { Decimal, numbers, prices } from "~/lib";
+import { Decimal, numbers, prices } from "~/lib/utils";
 import { DecimalInput } from "~/components/decimal-input";
 import { CurrencyAmount } from "@uniswap/sdk-core";
 

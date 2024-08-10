@@ -8,7 +8,7 @@ import { useDraftMakerContext } from "./context";
 import { useMemo } from "react";
 import { calculateMaxOutput, calculateTickerRange } from "./helper";
 import { CurrencyAmount } from "@uniswap/sdk-core";
-import { prices } from "~/lib";
+import { prices } from "~/lib/utils";
 import { tickToPrice } from "@uniswap/v3-sdk";
 
 export const Details = () => {

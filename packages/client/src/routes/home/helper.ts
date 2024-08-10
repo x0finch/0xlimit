@@ -7,7 +7,7 @@ import {
   TickMath,
 } from "@uniswap/v3-sdk";
 import JSBI from "jsbi";
-import { prices } from "~/lib";
+import { prices } from "~/lib/utils";
 
 export type TokenPrice = Price<Token, Token>;
 export type TokenAmount = CurrencyAmount<Token>;

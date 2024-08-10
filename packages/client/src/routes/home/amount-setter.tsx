@@ -6,7 +6,7 @@ import { TokenBadge } from "~/components/token/token.badge";
 import { useDraftMakerContext } from "./context";
 import { ChevronDownIcon, SymbolIcon } from "@radix-ui/react-icons";
 import { cn } from "@shadcn/utils";
-import { Decimal } from "~/lib";
+import { Decimal } from "~/lib/utils";
 import { CurrencyAmount } from "@uniswap/sdk-core";
 
 export const AmountSetter = () => {

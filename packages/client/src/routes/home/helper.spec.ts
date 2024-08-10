@@ -1,5 +1,5 @@
 import { CurrencyAmount, Token } from "@uniswap/sdk-core";
-import { prices } from "~/lib";
+import { prices } from "~/lib/utils";
 import { calculateMaxOutput, calculateTickerRange } from "./helper";
 import { FeeAmount, TICK_SPACINGS, tickToPrice } from "@uniswap/v3-sdk";
 import JSBI from "jsbi";

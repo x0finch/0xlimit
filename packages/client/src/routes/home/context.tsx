@@ -1,6 +1,6 @@
 import { Token } from "@uniswap/sdk-core";
 import { createContext, useContext, useMemo, useState } from "react";
-import { Decimal, prices } from "~/lib";
+import { Decimal, prices } from "~/lib/utils";
 import { TokenPrice } from "./helper";
 import { FeeAmount } from "@uniswap/v3-sdk";
 
