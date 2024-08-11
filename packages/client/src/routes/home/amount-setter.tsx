@@ -7,7 +7,8 @@ import { useDraftMakerContext } from "./context";
 import { ChevronDownIcon, SymbolIcon } from "@radix-ui/react-icons";
 import { cn } from "@shadcn/utils";
 import { Decimal } from "~/lib/utils";
-import { CurrencyAmount } from "@uniswap/sdk-core";
+import { Currency, CurrencyAmount } from "@uniswap/sdk-core";
+import { useCurrencyAmountOf } from "~/lib/hooks/use-currency-amount-of";
 
 export const AmountSetter = () => {
   return (
@@ -64,7 +65,9 @@ const AmountInput = () => {
           <ChevronDownIcon className="ml-1" />
         </Button>
       </div>
-      <Balance showMax />
+      <Balance showMax setAmount={setInputAmount}>
+        {baseCurrency}
+      </Balance>
     </Card>
   );
 };
@@ -131,15 +134,19 @@ const AmountOutput = () => {
           <ChevronDownIcon className="ml-1" />
         </Button>
       </div>
-      <Balance />
+      <Balance>{quoteCurrency}</Balance>
     </Card>
   );
 };
 
-const Balance: React.FC<{ className?: string; showMax?: boolean }> = ({
-  className,
-  showMax,
-}) => {
+const Balance: React.FC<{
+  children: Currency;
+  className?: string;
+  showMax?: boolean;
+  setAmount?: React.Dispatch<React.SetStateAction<Decimal>>;
+}> = ({ className, showMax, children: currency, setAmount }) => {
+  const { data } = useCurrencyAmountOf(currency);
+
   return (
     <div
       className={cn(
@@ -147,11 +154,15 @@ const Balance: React.FC<{ className?: string; showMax?: boolean }> = ({
         className
       )}
     >
-      <span className="text-nowrap text-muted-foreground">Balance: 21</span>
+      <span className="text-nowrap text-muted-foreground">
+        Balance: {data?.toSignificant(3) ?? "--"}
+      </span>
       {showMax && (
         <Button
           variant="ghost"
           className="h-full text-rose-500 font-bold p-0 rounded-full"
+          disabled={!data}
+          onClick={() => data && setAmount?.(data.toSignificant() as Decimal)}
         >
           Max
         </Button>
