@@ -1,4 +1,4 @@
-import { CurrencyAmount, Token } from "@uniswap/sdk-core";
+import { Token } from "@uniswap/sdk-core";
 import { prices } from "~/lib/utils";
 import { calculateMaxOutput, calculateTickerRange } from "./helper";
 import { FeeAmount, TICK_SPACINGS, tickToPrice } from "@uniswap/v3-sdk";
@@ -166,7 +166,8 @@ describe("calculateMaxOutput", () => {
   describe("when inputToken is token1 and outputToken is token0", () => {
     it("should return correct max output, weth to wbtc", () => {
       const maxOutput = calculateMaxOutput(
-        CurrencyAmount.fromRawAmount(weth, "68999999999999999876"),
+        "68.999999999999999876",
+        weth,
         wbtc,
         260200,
         260210
@@ -178,7 +179,8 @@ describe("calculateMaxOutput", () => {
   describe("when inputToken is token0 and outputToken is token1", () => {
     it("should return correct max output, wbtc to weth", () => {
       const maxOutput = calculateMaxOutput(
-        CurrencyAmount.fromRawAmount(wbtc, "345823510"),
+        "3.45823510",
+        wbtc,
         weth,
         260200,
         260210
@@ -187,12 +189,7 @@ describe("calculateMaxOutput", () => {
     });
 
     it("should return correct max output, wbtc to usdt", () => {
-      const maxOutput = calculateMaxOutput(
-        CurrencyAmount.fromRawAmount(wbtc, "200000"),
-        usdt,
-        65280,
-        65340
-      );
+      const maxOutput = calculateMaxOutput("0.002", wbtc, usdt, 65280, 65340);
       expect(maxOutput.quotient).toEqual(JSBI.BigInt("137171992"));
     });
   });

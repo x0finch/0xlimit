@@ -1,11 +1,11 @@
 import { Input, InputProps } from "@shadcn/components/ui/input";
-import { numbers } from "~/lib/utils";
+import { Decimal, numbers } from "~/lib/utils";
 
 export type DecimalInputProps = Omit<
   InputProps,
   "type" | "pattern" | "inputMode" | "onChange"
 > & {
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: Decimal) => void;
 };
 
 export const DecimalInput: React.FC<DecimalInputProps> = ({
@@ -19,7 +19,7 @@ export const DecimalInput: React.FC<DecimalInputProps> = ({
 }) => {
   const onChangeWrapped = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (numbers.DECIMAL_PATTERN.test(e.target.value)) {
-      onChange?.(e);
+      onChange?.(e.target.value as Decimal);
     }
   };
 

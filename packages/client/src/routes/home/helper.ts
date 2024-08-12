@@ -1,4 +1,4 @@
-import { CurrencyAmount, Price, Token } from "@uniswap/sdk-core";
+import { Currency } from "@uniswap/sdk-core";
 import {
   FeeAmount,
   maxLiquidityForAmounts,
@@ -7,27 +7,24 @@ import {
   TickMath,
 } from "@uniswap/v3-sdk";
 import JSBI from "jsbi";
-import { prices } from "~/lib/utils";
-
-export type TokenPrice = Price<Token, Token>;
-export type TokenAmount = CurrencyAmount<Token>;
+import { parseUnits } from "viem";
+import { CurrencyAmount, CurrencyPrice } from "~/lib/alternatives";
+import { Decimal, prices } from "~/lib/utils";
 
 const Q96 = JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(96));
 
 export const calculateTickerRange = (
   feeAmount: FeeAmount,
-  marketPrice: TokenPrice,
-  preferPrice: TokenPrice | null
+  marketPrice: CurrencyPrice,
+  preferPrice: CurrencyPrice
 ) => {
   const tickerSpacing = TICK_SPACINGS[feeAmount];
-  const sorted = marketPrice.baseCurrency.sortsBefore(
-    marketPrice.quoteCurrency
+  const sorted = marketPrice.baseCurrency.wrapped.sortsBefore(
+    marketPrice.quoteCurrency.wrapped
   );
 
   const marketTicker = prices.toTicker(marketPrice);
-  const preferTicker = preferPrice
-    ? prices.toTicker(preferPrice)
-    : marketTicker;
+  const preferTicker = prices.toTicker(preferPrice);
 
   const roundedPreferTicker = nearestUsableTick(preferTicker, tickerSpacing);
   let minTicker: number, maxTicker: number;
@@ -52,18 +49,25 @@ export const calculateTickerRange = (
 };
 
 export const calculateMaxOutput = (
-  inputAmount: TokenAmount,
-  outputToken: Token,
+  inputAmount: Decimal,
+  inputCurrency: Currency,
+  outputCurrency: Currency,
   minTicker: number,
   maxTicker: number
 ) => {
-  const sorted = inputAmount.currency.sortsBefore(outputToken);
+  const sorted = inputCurrency.wrapped.sortsBefore(outputCurrency.wrapped);
+
+  const inputCurrencyAmount = CurrencyAmount.fromRawAmount(
+    inputCurrency,
+    parseUnits(inputAmount, inputCurrency.decimals).toString()
+  );
+
   const lowerSqrt = TickMath.getSqrtRatioAtTick(minTicker);
   const upperSqrt = TickMath.getSqrtRatioAtTick(maxTicker);
 
   const [fakeCurSqrt, amount0, amount1] = sorted
-    ? [lowerSqrt, inputAmount.quotient, 0]
-    : [upperSqrt, 0, inputAmount.quotient];
+    ? [lowerSqrt, inputCurrencyAmount.quotient, 0]
+    : [upperSqrt, 0, inputCurrencyAmount.quotient];
 
   const liquidity = maxLiquidityForAmounts(
     fakeCurSqrt,
@@ -78,7 +82,7 @@ export const calculateMaxOutput = (
     ? calculateMaxAmount1(liquidity, lowerSqrt, upperSqrt)
     : calculateMaxAmount0(liquidity, lowerSqrt, upperSqrt);
 
-  return CurrencyAmount.fromRawAmount(outputToken, maxOutput);
+  return CurrencyAmount.fromRawAmount(outputCurrency, maxOutput);
 };
 
 const calculateMaxAmount0 = (

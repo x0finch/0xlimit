@@ -1,12 +1,12 @@
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { Avatar, AvatarImage } from "@shadcn/components/ui/avatar";
-import { Token } from "@uniswap/sdk-core";
+import { Currency } from "@uniswap/sdk-core";
 
 export const TokenAvatar: React.FC<{
-  children: Token | null | undefined;
+  children: Currency | null | undefined;
   size?: number | string;
 }> = ({ children: token, size }) => {
-  size ??= "1rem"
+  size ??= "1rem";
   const symbol = token?.symbol ?? "Unknown";
 
   return (

@@ -4,59 +4,67 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@shadcn/components/ui/accordion";
-import { useDraftMakerContext } from "./context";
+import { useDraftState } from "./context";
 import { useMemo } from "react";
 import { calculateMaxOutput, calculateTickerRange } from "./helper";
-import { CurrencyAmount } from "@uniswap/sdk-core";
 import { prices } from "~/lib/utils";
 import { tickToPrice } from "@uniswap/v3-sdk";
 
 export const Details = () => {
-  const { marketPrice, preferPrice, feeAmount, inputAmount } =
-    useDraftMakerContext();
+  const {
+    marketPrice,
+    priceBaseOnInput,
+    inputCurrency,
+    outputCurrency,
+    feeAmount,
+    inputAmount,
+  } = useDraftState();
+
   const { baseCurrency, quoteCurrency } = marketPrice;
+  const inputCurrencyIsBaseCurrency = inputCurrency.equals(baseCurrency);
+
+  const marketPriceBaseOnInput = useMemo(() => {
+    return inputCurrencyIsBaseCurrency ? marketPrice : marketPrice.invert();
+  }, [inputCurrencyIsBaseCurrency, marketPrice]);
 
   const { minTicker, maxTicker } = useMemo(
-    () => calculateTickerRange(feeAmount, marketPrice, preferPrice),
-    [marketPrice, preferPrice, feeAmount]
+    () =>
+      calculateTickerRange(feeAmount, marketPriceBaseOnInput, priceBaseOnInput),
+    [marketPriceBaseOnInput, priceBaseOnInput, feeAmount]
   );
   const [minPrice, maxPrice] = useMemo(() => {
-    const sorted = baseCurrency.sortsBefore(quoteCurrency);
+    const sorted = baseCurrency.wrapped.sortsBefore(quoteCurrency.wrapped);
     const results = [
-      tickToPrice(baseCurrency, quoteCurrency, minTicker),
-      tickToPrice(baseCurrency, quoteCurrency, maxTicker),
+      tickToPrice(baseCurrency.wrapped, quoteCurrency.wrapped, minTicker),
+      tickToPrice(baseCurrency.wrapped, quoteCurrency.wrapped, maxTicker),
     ];
     return sorted ? results : results.reverse();
-  }, [minTicker, maxTicker]);
+  }, [minTicker, maxTicker, baseCurrency, quoteCurrency]);
 
   const maxOutput = useMemo(() => {
     return calculateMaxOutput(
-      CurrencyAmount.fromRawAmount(
-        baseCurrency,
-        Number(inputAmount) * Math.pow(10, baseCurrency.decimals)
-      ),
-      quoteCurrency,
+      inputAmount,
+      inputCurrency,
+      outputCurrency,
       minTicker,
       maxTicker
-    ).toSignificant(6);
-  }, [baseCurrency, quoteCurrency, minTicker, maxTicker, inputAmount]);
+    ).toSignificant();
+  }, [inputCurrency, outputCurrency, minTicker, maxTicker, inputAmount]);
 
   const avgPrice = useMemo(() => {
-    const fakeInputAmount = 1;
+    const fakeInputAmount = "1";
     const fakeMaxOutput = calculateMaxOutput(
-      CurrencyAmount.fromRawAmount(
-        baseCurrency,
-        fakeInputAmount * Math.pow(10, baseCurrency.decimals)
-      ),
+      fakeInputAmount,
+      baseCurrency,
       quoteCurrency,
       minTicker,
       maxTicker
-    ).toSignificant(6);
+    ).toSignificant();
 
     return prices.from(
       baseCurrency,
       quoteCurrency,
-      Number(fakeMaxOutput) / fakeInputAmount
+      Number(fakeMaxOutput) / Number(fakeInputAmount)
     );
   }, [baseCurrency, quoteCurrency, minTicker, maxTicker]);
 
@@ -66,20 +74,14 @@ export const Details = () => {
         <AccordionTrigger className="hover:no-underline py-3">
           {!avgPrice && "-"}
           {avgPrice &&
-            `Avg. 1 ${avgPrice.baseCurrency.symbol} = ${avgPrice.toSignificant(
-              6
-            )} ${avgPrice.quoteCurrency.symbol}`}
+            `Avg. 1 ${baseCurrency.symbol} = ${avgPrice.toSignificant()} ${
+              quoteCurrency.symbol
+            }`}
         </AccordionTrigger>
         <AccordionContent>
           <ContentRow label="Max Output" value={maxOutput} />
-          <ContentRow
-            label="Min Price"
-            value={`${minPrice.toSignificant(6)}`}
-          />
-          <ContentRow
-            label="Max Price"
-            value={`${maxPrice.toSignificant(6)}`}
-          />
+          <ContentRow label="Min Price" value={`${minPrice.toSignificant()}`} />
+          <ContentRow label="Max Price" value={`${maxPrice.toSignificant()}`} />
         </AccordionContent>
       </AccordionItem>
     </Accordion>

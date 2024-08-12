@@ -1,13 +1,12 @@
 import { Button } from "@shadcn/components/ui/button";
 import { Card } from "@shadcn/components/ui/card";
-import { useMemo } from "react";
 import { DecimalInput } from "~/components/decimal-input";
 import { TokenBadge } from "~/components/token/token.badge";
-import { useDraftMakerContext } from "./context";
+import { useDraftState } from "./context";
 import { ChevronDownIcon, SymbolIcon } from "@radix-ui/react-icons";
 import { cn } from "@shadcn/utils";
 import { Decimal } from "~/lib/utils";
-import { Currency, CurrencyAmount } from "@uniswap/sdk-core";
+import { Currency } from "@uniswap/sdk-core";
 import { useCurrencyAmountOf } from "~/lib/hooks/use-currency-amount-of";
 
 export const AmountSetter = () => {
@@ -21,30 +20,7 @@ export const AmountSetter = () => {
 };
 
 const AmountInput = () => {
-  const {
-    preferPrice,
-    marketPrice,
-    inputAmount,
-    setInputAmount,
-    setOutputAmount,
-  } = useDraftMakerContext();
-  const price = preferPrice || marketPrice;
-  const { baseCurrency } = price;
-
-  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputAmount = e.target.value;
-    const outputAmount = price
-      .quote(
-        CurrencyAmount.fromRawAmount(
-          baseCurrency,
-          Math.floor(Number(inputAmount) * Math.pow(10, baseCurrency.decimals))
-        )
-      )
-      .toSignificant(6);
-
-    setInputAmount(inputAmount as Decimal);
-    setOutputAmount(outputAmount as Decimal);
-  };
+  const { inputCurrency, inputAmount, onInputAmountChange } = useDraftState();
 
   return (
     <Card className="w-full bg-accent flex flex-col p-4 rounded-2xl border-none shadow-none h-[120px] overflow-clip">
@@ -55,28 +31,28 @@ const AmountInput = () => {
           style={{ height: "2.6rem" }}
           autoComplete="off"
           autoCorrect="off"
-          value={inputAmount ?? ""}
-          onChange={onInputChange}
+          value={inputAmount}
+          onChange={onInputAmountChange}
         />
         <Button variant="outline" className="rounded-full h-8 pl-1 pr-2 py-0">
           <TokenBadge avatarSize="1.5rem" className="text-lg">
-            {baseCurrency}
+            {inputCurrency}
           </TokenBadge>
           <ChevronDownIcon className="ml-1" />
         </Button>
       </div>
-      <Balance showMax setAmount={setInputAmount}>
-        {baseCurrency}
+      <Balance showMax onAmountChange={onInputAmountChange}>
+        {inputCurrency}
       </Balance>
     </Card>
   );
 };
 
 const CenterInvert = () => {
-  const { invert } = useDraftMakerContext();
+  const { toggleInputOutputCurrencies } = useDraftState();
   return (
     <Button
-      onClick={invert}
+      onClick={toggleInputOutputCurrencies}
       variant="outline"
       className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 p-0 border-4 border-background bg-accent shadow-none rounded-xl"
     >
@@ -86,34 +62,8 @@ const CenterInvert = () => {
 };
 
 const AmountOutput = () => {
-  const {
-    marketPrice,
-    preferPrice,
-    outputAmount,
-    setOutputAmount,
-    setInputAmount,
-  } = useDraftMakerContext();
-
-  const price = preferPrice || marketPrice;
-  const { quoteCurrency } = price;
-  const invertedPrice = useMemo(() => price.invert(), [price]);
-
-  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const outputAmount = e.target.value;
-    const inputAmount = invertedPrice
-      .quote(
-        CurrencyAmount.fromRawAmount(
-          quoteCurrency,
-          Math.floor(
-            Number(outputAmount) * Math.pow(10, quoteCurrency.decimals)
-          )
-        )
-      )
-      .toSignificant(6);
-
-    setOutputAmount(outputAmount as Decimal);
-    setInputAmount(inputAmount as Decimal);
-  };
+  const { outputCurrency, outputAmount, onOutputAmountChange } =
+    useDraftState();
 
   return (
     <Card className="w-full bg-accent flex flex-col p-4 rounded-2xl border-none shadow-none h-[120px] overflow-clip">
@@ -124,17 +74,17 @@ const AmountOutput = () => {
           style={{ height: "2.6rem" }}
           autoComplete="off"
           autoCorrect="off"
-          value={outputAmount ?? ""}
-          onChange={onInputChange}
+          value={outputAmount}
+          onChange={onOutputAmountChange}
         />
         <Button variant="outline" className="rounded-full h-8 pl-1 pr-2 py-0">
           <TokenBadge avatarSize="1.5rem" className="text-lg">
-            {quoteCurrency}
+            {outputCurrency}
           </TokenBadge>
           <ChevronDownIcon className="ml-1" />
         </Button>
       </div>
-      <Balance>{quoteCurrency}</Balance>
+      <Balance>{outputCurrency}</Balance>
     </Card>
   );
 };
@@ -143,8 +93,8 @@ const Balance: React.FC<{
   children: Currency;
   className?: string;
   showMax?: boolean;
-  setAmount?: React.Dispatch<React.SetStateAction<Decimal>>;
-}> = ({ className, showMax, children: currency, setAmount }) => {
+  onAmountChange?: (amount: Decimal) => void;
+}> = ({ className, showMax, children: currency, onAmountChange }) => {
   const { data } = useCurrencyAmountOf(currency);
 
   return (
@@ -162,7 +112,7 @@ const Balance: React.FC<{
           variant="ghost"
           className="h-full text-rose-500 font-bold p-0 rounded-full"
           disabled={!data}
-          onClick={() => data && setAmount?.(data.toSignificant() as Decimal)}
+          onClick={() => data && onAmountChange?.(data.toExact() as Decimal)}
         >
           Max
         </Button>

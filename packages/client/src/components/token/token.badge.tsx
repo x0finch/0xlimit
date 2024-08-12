@@ -1,9 +1,9 @@
-import { Token } from "@uniswap/sdk-core";
+import { Currency } from "@uniswap/sdk-core";
 import { TokenAvatar } from "./token.avatar";
 import { cn } from "@shadcn/utils";
 
 export const TokenBadge: React.FC<{
-  children: Token | null | undefined;
+  children: Currency | null | undefined;
   avatarSize?: string | number;
   className?: string;
 }> = ({ children: token, avatarSize, className }) => {
