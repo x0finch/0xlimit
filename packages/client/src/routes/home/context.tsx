@@ -54,7 +54,7 @@ const wbtc = new Token(
   "WBTC"
 );
 
-const transformPrice = (
+const rebasePrice = (
   marketPrice: CurrencyPrice,
   inputPrice: Decimal | null,
   inputCurrency: Currency
@@ -77,23 +77,29 @@ const transformPrice = (
     : [price.invert(), price];
 };
 
-export const DraftStateProvider: React.FC<React.PropsWithChildren<unknown>> = ({
+export const DraftStateProvider: React.FC<
+  React.PropsWithChildren<{
+    inputCurrency: Currency;
+    outputCurrency: Currency;
+    marketPrice: CurrencyPrice;
+    toggleInputOutputCurrencies: () => void;
+    toggleBaseQuoteCurrencies: () => void;
+  }>
+> = ({
   children,
+  inputCurrency,
+  outputCurrency,
+  marketPrice,
+  toggleInputOutputCurrencies: toggleInputOutputCurrenciesOuter,
+  toggleBaseQuoteCurrencies: toggleBaseQuoteCurrenciesOuter,
 }) => {
-  const [inputCurrency, setInputCurrency] = useState<Currency>(eth);
-  const [outputCurrency, setOutputCurrency] = useState<Currency>(usdt);
-
-  const [marketPrice, setMarketPrice] = useState(
-    prices.from(inputCurrency, outputCurrency, 2731.92)
-  );
-
   const [inputPrice, setInputPrice] = useState<Decimal | null>(null);
   const [inputAmount, setInputAmount] = useState<Decimal>("");
   const [outputAmount, setOutputAmount] = useState<Decimal>("");
-  const [feeAmount, setFeeAmount] = useState<FeeAmount>(FeeAmount.MEDIUM);
+  const [feeAmount, setFeeAmount] = useState<FeeAmount>(FeeAmount.LOW);
 
   const [priceBaseOnInput, priceBaseOnOutput] = useMemo(
-    () => transformPrice(marketPrice, inputPrice, inputCurrency),
+    () => rebasePrice(marketPrice, inputPrice, inputCurrency),
     [marketPrice, inputPrice, inputCurrency]
   );
 
@@ -123,7 +129,7 @@ export const DraftStateProvider: React.FC<React.PropsWithChildren<unknown>> = ({
 
   const onInputPriceChange = (value: Decimal | null) => {
     setInputPrice(value);
-    const [newPriceBaseOnInput] = transformPrice(
+    const [newPriceBaseOnInput] = rebasePrice(
       marketPrice,
       value,
       inputCurrency
@@ -139,15 +145,15 @@ export const DraftStateProvider: React.FC<React.PropsWithChildren<unknown>> = ({
   };
 
   const toggleInputOutputCurrencies = () => {
-    setInputCurrency(outputCurrency);
-    setOutputCurrency(inputCurrency);
     setInputAmount(outputAmount);
     setOutputAmount(inputAmount);
+    toggleInputOutputCurrenciesOuter();
   };
 
   const toggleBaseQuoteCurrencies = () => {
+    toggleBaseQuoteCurrenciesOuter();
+
     const invertedMarketPrice = marketPrice.invert();
-    setMarketPrice(invertedMarketPrice);
 
     if (inputPrice !== null) {
       const newInputPrice = invertedMarketPrice.baseCurrency.equals(

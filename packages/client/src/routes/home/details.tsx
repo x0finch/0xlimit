@@ -23,6 +23,7 @@ export const Details = () => {
   const { baseCurrency, quoteCurrency } = marketPrice;
 
   const [tickLower, tickUpper] = useTickRange(
+    inputCurrency,
     marketPrice,
     priceBaseOnInput,
     feeAmount

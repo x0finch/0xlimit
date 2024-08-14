@@ -26,21 +26,22 @@ export const useV3Pool = (
     [currency0, currency1, feeAmount]
   );
 
-  const { data, isLoading, isPending, isSuccess, error } = useReadContracts({
-    allowFailure: true,
-    contracts: [
-      {
-        address: poolAddress,
-        abi: uniswapV3PoolAbi,
-        functionName: "liquidity",
-      },
-      {
-        address: poolAddress,
-        abi: uniswapV3PoolAbi,
-        functionName: "slot0",
-      },
-    ],
-  });
+  const { data, isLoading, isPending, isSuccess, error, dataUpdatedAt } =
+    useReadContracts({
+      allowFailure: true,
+      contracts: [
+        {
+          address: poolAddress,
+          abi: uniswapV3PoolAbi,
+          functionName: "liquidity",
+        },
+        {
+          address: poolAddress,
+          abi: uniswapV3PoolAbi,
+          functionName: "slot0",
+        },
+      ],
+    });
 
   const pool = useMemo(() => {
     if (!data || data.every((item) => item.status !== "success")) {
@@ -63,6 +64,13 @@ export const useV3Pool = (
       tick
     );
   }, [currency0, currency1, feeAmount, data]);
+
+  // console.log("pool: ", {
+  //   feeAmount,
+  //   poolAddress,
+  //   pool,
+  //   isNotExist: pool?.isNotExist,
+  // });
 
   const createInitialPool = useCallback(
     (marketPrice: CurrencyPrice) => {
@@ -92,5 +100,6 @@ export const useV3Pool = (
     isPending,
     isSuccess,
     error: error as Error,
+    dataUpdatedAt,
   };
 };

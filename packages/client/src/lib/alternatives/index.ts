@@ -19,7 +19,7 @@ const ZERO = JSBI.BigInt(0);
 const isZero = (value: JSBI) => JSBI.equal(value, ZERO);
 
 export class Pool extends UniswapPool {
-  get isNotExist() {
+  get isNotLiquidity() {
     return isZero(this.liquidity) || isZero(this.sqrtRatioX96);
   }
 }

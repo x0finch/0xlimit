@@ -17,7 +17,7 @@ export const from = (
     ),
     quoteAmount: CurrencyAmount.fromRawAmount(
       quoteCurrency,
-      parseUnits(String(price), quoteCurrency.decimals).toString()
+      Math.floor(Number(price) * Math.pow(10, quoteCurrency.decimals))
     ),
   });
 };

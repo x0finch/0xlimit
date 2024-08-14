@@ -2,7 +2,8 @@ import { FeeAmount, nearestUsableTick, TICK_SPACINGS } from "@uniswap/v3-sdk";
 import { CurrencyPrice } from "../alternatives";
 import { currencies, prices } from "../utils";
 import { useMemo } from "react";
-import { useSortedPrice } from "./use-sorted";
+import { useRebasePrice } from "./use-sorted";
+import { Currency } from "@uniswap/sdk-core";
 
 export const calculateTickRange = (
   marketPrice: CurrencyPrice,
@@ -41,15 +42,16 @@ export const calculateTickRange = (
 };
 
 export const useTickRange = (
+  inputCurrency: Currency,
   marketPrice: CurrencyPrice,
   preferPrice: CurrencyPrice,
   feeAmount: FeeAmount
 ) => {
-  const sortedMarketPrice = useSortedPrice(marketPrice);
-  const sortedPreferPrice = useSortedPrice(preferPrice);
+  const rebasedMarketPrice = useRebasePrice(inputCurrency, marketPrice);
+  const rebasedPreferPrice = useRebasePrice(inputCurrency, preferPrice);
 
   return useMemo(
-    () => calculateTickRange(sortedMarketPrice, sortedPreferPrice, feeAmount),
-    [feeAmount, sortedMarketPrice, sortedPreferPrice]
+    () => calculateTickRange(rebasedMarketPrice, rebasedPreferPrice, feeAmount),
+    [feeAmount, rebasedMarketPrice, rebasedPreferPrice]
   );
 };

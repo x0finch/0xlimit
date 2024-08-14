@@ -11,13 +11,12 @@ export const PriceSetter = () => {
   const {
     marketPrice: { baseCurrency, quoteCurrency },
   } = useDraftState();
-  const baseTokenKey = `${baseCurrency.chainId}_${baseCurrency.wrapped.address}`;
-  const quoteTokenKey = `${quoteCurrency.chainId}_${quoteCurrency.wrapped.address}`;
 
-  return <InnerPriceSetter key={`${baseTokenKey}/${quoteTokenKey}`} />;
+  const key = `${baseCurrency.wrapped.address}/${quoteCurrency.wrapped.address}`;
+  return <_PriceSetter key={key} />;
 };
 
-const InnerPriceSetter = () => {
+const _PriceSetter = () => {
   const {
     marketPrice,
     inputPrice,
@@ -126,11 +125,12 @@ const AdjustPercents = () => {
 const CurrentPercentItem: React.FC<{
   children: number;
   onClick: () => void;
-}> = ({ children: percent, onClick }) => {
+  disabled?: boolean;
+}> = ({ children: percent, onClick, disabled }) => {
   const isPositive = percent > 0;
 
   return (
-    <SmallOutlineButton isActive onClick={onClick}>
+    <SmallOutlineButton isActive onClick={onClick} disabled={disabled}>
       {isPositive ? "+" : "-"}
       {Math.abs(percent)}%
       <Cross2Icon className="w-4 h-4 ml-1 mr-[-0.25rem]" />
@@ -142,11 +142,16 @@ const PercentItem: React.FC<{
   children: number;
   isActive?: boolean;
   onClick?: () => void;
-}> = ({ children: percent, onClick, isActive }) => {
+  disabled?: boolean;
+}> = ({ children: percent, onClick, isActive, disabled }) => {
   const isPositive = percent > 0;
 
   return (
-    <SmallOutlineButton onClick={onClick} isActive={isActive}>
+    <SmallOutlineButton
+      onClick={onClick}
+      isActive={isActive}
+      disabled={disabled}
+    >
       {isPositive ? "+" : "-"}
       {Math.abs(percent)}%
     </SmallOutlineButton>
@@ -157,14 +162,16 @@ const SmallOutlineButton: React.FC<
   React.PropsWithChildren<{
     isActive?: boolean;
     onClick?: () => void;
+    disabled?: boolean;
   }>
-> = ({ children, isActive, onClick }) => {
+> = ({ children, isActive, onClick, disabled }) => {
   return (
     <Button
       variant="outline"
       size="sm"
       className={`rounded-3xl h-7 bg-none ${isActive ? "bg-secondary" : ""}`}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </Button>

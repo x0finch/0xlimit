@@ -34,6 +34,7 @@ export const useMintPosition = (
   } = useV3Pool(inputCurrency, outputCurrency, feeAmount);
 
   const [tickLower, tickUpper] = useTickRange(
+    inputCurrency,
     marketPrice,
     preferPrice,
     feeAmount
@@ -72,7 +73,7 @@ export const useMintPosition = (
         recipient: address,
         deadline,
         slippageTolerance,
-        createPool: positionPool.isNotExist,
+        createPool: positionPool.isNotLiquidity,
         useNative: inputCurrency.isNative ? inputCurrency : undefined,
       }
     );

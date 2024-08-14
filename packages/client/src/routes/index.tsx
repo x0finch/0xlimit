@@ -10,6 +10,10 @@ export const router: ReturnType<typeof createBrowserRouter> =
           index: true,
           lazy: () => import("./home"),
         },
+        {
+          path: "/:chainId",
+          lazy: () => import("./home"),
+        },
       ],
     },
   ]);

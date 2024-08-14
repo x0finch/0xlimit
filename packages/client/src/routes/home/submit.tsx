@@ -104,11 +104,14 @@ const ConfirmButton = () => {
     onInputAmountChange("");
   };
 
+  const isPreparing = isFetchingPool;
   const isConfirmDisabled =
-    isFetchingPool || !isEnoughBalance || !isInputPositiveAmount;
+    isPreparing || !isEnoughBalance || !isInputPositiveAmount;
 
   const text = useMemo(() => {
     switch (true) {
+      case isPreparing:
+        return "Loading...";
       case !isEnoughBalance:
         return `Insufficient ${inputCurrency.symbol} Balance`;
       case !hasApproved:
@@ -117,13 +120,13 @@ const ConfirmButton = () => {
       case hasApproved:
         return "Confirm";
     }
-  }, [isEnoughBalance, hasApproved, inputCurrency.symbol]);
+  }, [isPreparing, isEnoughBalance, hasApproved, inputCurrency.symbol]);
 
   return (
     <Button
       className={cn(
         "w-full h-12 rounded-2xl bg-primary",
-        !isEnoughBalance && "bg-red-500"
+        !isPreparing && !isEnoughBalance && "bg-red-500"
       )}
       disabled={isConfirmDisabled}
       onClick={onConfirm}
