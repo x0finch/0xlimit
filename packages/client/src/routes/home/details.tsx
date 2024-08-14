@@ -6,9 +6,9 @@ import {
 } from "@shadcn/components/ui/accordion";
 import { useDraftState } from "./context";
 import { useMemo } from "react";
-import { calculateMaxOutput, calculateTickerRange } from "./helper";
-import { prices } from "~/lib/utils";
-import { tickToPrice } from "@uniswap/v3-sdk";
+import { useEstimateAvgPrice, usePriceRange } from "./helper";
+import { useTickRange } from "~/lib/hooks/use-tick-range";
+import { useMaxOutput } from "~/lib/hooks/use-max-output";
 
 export const Details = () => {
   const {
@@ -21,67 +21,58 @@ export const Details = () => {
   } = useDraftState();
 
   const { baseCurrency, quoteCurrency } = marketPrice;
-  const inputCurrencyIsBaseCurrency = inputCurrency.equals(baseCurrency);
 
-  const marketPriceBaseOnInput = useMemo(() => {
-    return inputCurrencyIsBaseCurrency ? marketPrice : marketPrice.invert();
-  }, [inputCurrencyIsBaseCurrency, marketPrice]);
-
-  const { minTicker, maxTicker } = useMemo(
-    () =>
-      calculateTickerRange(feeAmount, marketPriceBaseOnInput, priceBaseOnInput),
-    [marketPriceBaseOnInput, priceBaseOnInput, feeAmount]
+  const [tickLower, tickUpper] = useTickRange(
+    marketPrice,
+    priceBaseOnInput,
+    feeAmount
   );
-  const [minPrice, maxPrice] = useMemo(() => {
-    const sorted = baseCurrency.wrapped.sortsBefore(quoteCurrency.wrapped);
-    const results = [
-      tickToPrice(baseCurrency.wrapped, quoteCurrency.wrapped, minTicker),
-      tickToPrice(baseCurrency.wrapped, quoteCurrency.wrapped, maxTicker),
-    ];
-    return sorted ? results : results.reverse();
-  }, [minTicker, maxTicker, baseCurrency, quoteCurrency]);
+  const [priceLower, priceUpper] = usePriceRange(
+    baseCurrency,
+    quoteCurrency,
+    tickLower,
+    tickUpper
+  );
 
-  const maxOutput = useMemo(() => {
-    return calculateMaxOutput(
-      inputAmount,
-      inputCurrency,
-      outputCurrency,
-      minTicker,
-      maxTicker
-    ).toSignificant();
-  }, [inputCurrency, outputCurrency, minTicker, maxTicker, inputAmount]);
+  const maxOutput = useMaxOutput(
+    inputAmount,
+    inputCurrency,
+    outputCurrency,
+    tickLower,
+    tickUpper
+  );
 
-  const avgPrice = useMemo(() => {
-    const fakeInputAmount = "1";
-    const fakeMaxOutput = calculateMaxOutput(
-      fakeInputAmount,
-      baseCurrency,
-      quoteCurrency,
-      minTicker,
-      maxTicker
-    ).toSignificant();
-
-    return prices.from(
-      baseCurrency,
-      quoteCurrency,
-      Number(fakeMaxOutput) / Number(fakeInputAmount)
-    );
-  }, [baseCurrency, quoteCurrency, minTicker, maxTicker]);
+  const avgPrice = useEstimateAvgPrice(
+    "1", // use 1 as input amount to estimate
+    inputCurrency,
+    outputCurrency,
+    tickLower,
+    tickUpper
+  );
+  const rebaseAvgPrice = useMemo(() => {
+    return avgPrice.baseCurrency.equals(baseCurrency)
+      ? avgPrice
+      : avgPrice.invert();
+  }, [avgPrice, baseCurrency]);
 
   return (
     <Accordion type="single" collapsible className="w-full px-2">
       <AccordionItem value="item-1" className="border-none">
         <AccordionTrigger className="hover:no-underline py-3">
-          {!avgPrice && "-"}
-          {avgPrice &&
-            `Avg. 1 ${baseCurrency.symbol} = ${avgPrice.toSignificant()} ${
-              quoteCurrency.symbol
-            }`}
+          {`Avg 1 ${baseCurrency.symbol} = ${rebaseAvgPrice.toSignificant(6)} ${
+            quoteCurrency.symbol
+          }`}
         </AccordionTrigger>
         <AccordionContent>
-          <ContentRow label="Max Output" value={maxOutput} />
-          <ContentRow label="Min Price" value={`${minPrice.toSignificant()}`} />
-          <ContentRow label="Max Price" value={`${maxPrice.toSignificant()}`} />
+          <ContentRow label="Max Output" value={maxOutput.toSignificant()} />
+          <ContentRow
+            label="Min Price"
+            value={`${priceLower.toSignificant()} ${quoteCurrency.symbol}`}
+          />
+          <ContentRow
+            label="Max Price"
+            value={`${priceUpper.toSignificant()} ${quoteCurrency.symbol}`}
+          />
         </AccordionContent>
       </AccordionItem>
     </Accordion>

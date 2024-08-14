@@ -1,15 +1,9 @@
-import {
-  Currency,
-  CurrencyAmount,
-  Fraction,
-  Percent,
-  Price,
-  Token,
-} from "@uniswap/sdk-core";
+import { Currency, CurrencyAmount, Percent, Price } from "@uniswap/sdk-core";
 import { encodeSqrtRatioX96, TickMath } from "@uniswap/v3-sdk";
 import { CurrencyPrice } from "../alternatives";
 import { parseUnits } from "viem";
 import { Decimal } from "./numbers";
+import { currencies } from ".";
 
 export const from = (
   baseCurrency: Currency,
@@ -28,10 +22,8 @@ export const from = (
   });
 };
 
-export const toTicker = (price: CurrencyPrice) => {
-  const sorted = price.baseCurrency.wrapped.sortsBefore(
-    price.quoteCurrency.wrapped
-  );
+export const toTick = (price: CurrencyPrice) => {
+  const sorted = currencies.isSorted(price.baseCurrency, price.quoteCurrency);
 
   if (price.asFraction.equalTo(0)) {
     return 0;
@@ -82,5 +74,14 @@ export const adjust = (
     basePrice.quoteCurrency,
     newPriceFraction.denominator,
     newPriceFraction.numerator
+  );
+};
+
+export const unwrappedPrice = (price: CurrencyPrice) => {
+  return new Price(
+    price.baseCurrency.wrapped,
+    price.quoteCurrency.wrapped,
+    price.numerator,
+    price.denominator
   );
 };

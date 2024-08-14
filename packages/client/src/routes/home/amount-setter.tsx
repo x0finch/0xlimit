@@ -8,6 +8,7 @@ import { cn } from "@shadcn/utils";
 import { Decimal } from "~/lib/utils";
 import { Currency } from "@uniswap/sdk-core";
 import { useCurrencyAmountOf } from "~/lib/hooks/use-currency-amount-of";
+import { useAccount } from "wagmi";
 
 export const AmountSetter = () => {
   return (
@@ -95,7 +96,8 @@ const Balance: React.FC<{
   showMax?: boolean;
   onAmountChange?: (amount: Decimal) => void;
 }> = ({ className, showMax, children: currency, onAmountChange }) => {
-  const { data } = useCurrencyAmountOf(currency);
+  const { address } = useAccount();
+  const { data } = useCurrencyAmountOf(address, currency);
 
   return (
     <div

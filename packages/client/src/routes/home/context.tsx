@@ -41,6 +41,12 @@ const eth = Ether.onChain(1);
 //   6,
 //   "USDC"
 // );
+const usdt = new Token(
+  1,
+  "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+  6,
+  "USDT"
+);
 const wbtc = new Token(
   1,
   "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
@@ -75,16 +81,16 @@ export const DraftStateProvider: React.FC<React.PropsWithChildren<unknown>> = ({
   children,
 }) => {
   const [inputCurrency, setInputCurrency] = useState<Currency>(eth);
-  const [outputCurrency, setOutputCurrency] = useState<Currency>(wbtc);
+  const [outputCurrency, setOutputCurrency] = useState<Currency>(usdt);
 
   const [marketPrice, setMarketPrice] = useState(
-    prices.from(inputCurrency, outputCurrency, 0.05)
+    prices.from(inputCurrency, outputCurrency, 2731.92)
   );
 
   const [inputPrice, setInputPrice] = useState<Decimal | null>(null);
   const [inputAmount, setInputAmount] = useState<Decimal>("");
   const [outputAmount, setOutputAmount] = useState<Decimal>("");
-  const [feeAmount, setFeeAmount] = useState<FeeAmount>(FeeAmount.LOW);
+  const [feeAmount, setFeeAmount] = useState<FeeAmount>(FeeAmount.MEDIUM);
 
   const [priceBaseOnInput, priceBaseOnOutput] = useMemo(
     () => transformPrice(marketPrice, inputPrice, inputCurrency),

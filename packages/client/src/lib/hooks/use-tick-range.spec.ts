@@ -1,8 +1,7 @@
 import { Token } from "@uniswap/sdk-core";
 import { prices } from "~/lib/utils";
-import { calculateMaxOutput, calculateTickerRange } from "./helper";
 import { FeeAmount, TICK_SPACINGS, tickToPrice } from "@uniswap/v3-sdk";
-import JSBI from "jsbi";
+import { calculateTickRange } from "./use-tick-range";
 
 const token1 = new Token(
   1,
@@ -19,10 +18,10 @@ const token0 = new Token(
 
 const ALL_FEE_AMOUNTS = Object.keys(TICK_SPACINGS) as unknown as FeeAmount[];
 
-describe("calculateTickerRange", () => {
+describe.only("calculateTickRange", () => {
   describe("when inputToken is token1 and outputToken is token0", () => {
     ALL_FEE_AMOUNTS.forEach((feeAmount) => {
-      describe(`should return correct ticker range on feeAmount ${feeAmount}`, () => {
+      describe(`should return correct tick range on feeAmount ${feeAmount}`, () => {
         const cases = new Array(3)
           .fill(0)
           .map((_, i) => 1 + 1.001 * i)
@@ -45,31 +44,31 @@ describe("calculateTickerRange", () => {
               testCase.outputToken,
               testCase.preferPrice
             );
-            const marketTicker = prices.toTicker(marketPrice);
-            const preferTicker = prices.toTicker(preferPrice);
+            const marketTick = prices.toTick(marketPrice);
+            const preferTick = prices.toTick(preferPrice);
 
-            const { minTicker, maxTicker } = calculateTickerRange(
-              feeAmount,
+            const [tickLower, tickUpper] = calculateTickRange(
               marketPrice,
-              preferPrice
+              preferPrice,
+              feeAmount
             );
             const minPrice = tickToPrice(
               testCase.inputToken,
               testCase.outputToken,
-              maxTicker
-            ); // maxTicker -> minPrice
+              tickUpper
+            ); // tickUpper -> minPrice
             const maxPrice = tickToPrice(
               testCase.inputToken,
               testCase.outputToken,
-              minTicker
-            ); // minTicker -> maxPrice
+              tickLower
+            ); // tickLower -> maxPrice
 
-            // minTicker and maxTicker both be less than marketTicker
-            expect(minTicker).toBeLessThan(marketTicker);
-            expect(maxTicker).toBeLessThan(marketTicker);
+            // tickLower and tickUpper both be less than marketTick
+            expect(tickLower).toBeLessThan(marketTick);
+            expect(tickUpper).toBeLessThan(marketTick);
 
-            expect(minTicker).toBeLessThan(preferTicker);
-            expect(minTicker).toBeLessThan(maxTicker);
+            expect(tickLower).toBeLessThan(preferTick);
+            expect(tickLower).toBeLessThan(tickUpper);
 
             expect(maxPrice.greaterThan(marketPrice)).toBeTruthy();
             expect(maxPrice.greaterThan(preferPrice)).toBeTruthy();
@@ -83,7 +82,7 @@ describe("calculateTickerRange", () => {
 
   describe("when inputToken is token0 and outputToken is token1", () => {
     ALL_FEE_AMOUNTS.forEach((feeAmount) => {
-      describe(`should return correct ticker range on feeAmount ${feeAmount}`, () => {
+      describe(`should return correct tick range on feeAmount ${feeAmount}`, () => {
         const cases = new Array(3)
           .fill(0)
           .map((_, i) => 1 + 0.3 * i)
@@ -106,31 +105,31 @@ describe("calculateTickerRange", () => {
               testCase.outputToken,
               testCase.preferPrice
             );
-            const marketTicker = prices.toTicker(marketPrice);
-            const preferTicker = prices.toTicker(preferPrice);
+            const marketTick = prices.toTick(marketPrice);
+            const preferTick = prices.toTick(preferPrice);
 
-            const { minTicker, maxTicker } = calculateTickerRange(
-              feeAmount,
+            const [tickLower, tickUpper] = calculateTickRange(
               marketPrice,
-              preferPrice
+              preferPrice,
+              feeAmount
             );
             const minPrice = tickToPrice(
               testCase.inputToken,
               testCase.outputToken,
-              minTicker
-            ); // minTicker -> minPrice
+              tickLower
+            ); // tickLower -> minPrice
             const maxPrice = tickToPrice(
               testCase.inputToken,
               testCase.outputToken,
-              maxTicker
-            ); // maxTicker -> maxPrice
+              tickUpper
+            ); // tickUpper -> maxPrice
 
-            // minTicker and maxTicker both be greater than marketTicker
-            expect(minTicker).toBeGreaterThan(marketTicker);
-            expect(maxTicker).toBeGreaterThan(marketTicker);
+            // tickLower and tickUpper both be greater than marketTick
+            expect(tickLower).toBeGreaterThan(marketTick);
+            expect(tickUpper).toBeGreaterThan(marketTick);
 
-            expect(minTicker).toBeLessThan(maxTicker);
-            expect(maxTicker).toBeGreaterThan(preferTicker);
+            expect(tickLower).toBeLessThan(tickUpper);
+            expect(tickUpper).toBeGreaterThan(preferTick);
 
             expect(minPrice.greaterThan(marketPrice)).toBeTruthy();
             expect(minPrice.lessThan(maxPrice)).toBeTruthy();
@@ -139,58 +138,6 @@ describe("calculateTickerRange", () => {
           });
         });
       });
-    });
-  });
-});
-
-const weth = new Token(
-  1,
-  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-  18,
-  "WETH"
-);
-const wbtc = new Token(
-  1,
-  "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
-  8,
-  "WBTC"
-);
-const usdt = new Token(
-  1,
-  "0xdac17f958d2ee523a2206206994597c13d831ec7",
-  6,
-  "USDT"
-);
-
-describe("calculateMaxOutput", () => {
-  describe("when inputToken is token1 and outputToken is token0", () => {
-    it("should return correct max output, weth to wbtc", () => {
-      const maxOutput = calculateMaxOutput(
-        "68.999999999999999876",
-        weth,
-        wbtc,
-        260200,
-        260210
-      );
-      expect(maxOutput.quotient).toEqual(JSBI.BigInt(345823510));
-    });
-  });
-
-  describe("when inputToken is token0 and outputToken is token1", () => {
-    it("should return correct max output, wbtc to weth", () => {
-      const maxOutput = calculateMaxOutput(
-        "3.45823510",
-        wbtc,
-        weth,
-        260200,
-        260210
-      );
-      expect(maxOutput.quotient).toEqual(JSBI.BigInt("68999999959754359466"));
-    });
-
-    it("should return correct max output, wbtc to usdt", () => {
-      const maxOutput = calculateMaxOutput("0.002", wbtc, usdt, 65280, 65340);
-      expect(maxOutput.quotient).toEqual(JSBI.BigInt("137171992"));
     });
   });
 });

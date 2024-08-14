@@ -1,20 +1,13 @@
 import { Currency, CurrencyAmount } from "@uniswap/sdk-core";
 import { useMemo } from "react";
 import { Address, erc20Abi } from "viem";
-import { useAccount, useBalance, useReadContract } from "wagmi";
+import { useBalance, useReadContract } from "wagmi";
 import { objects } from "../utils";
 
-type AddressOrSelf = "self" | Address;
-
 export const useCurrencyAmountOf = (
-  currency: Currency,
-  addressOrSelf: AddressOrSelf = "self"
+  address: Address | undefined,
+  currency: Currency
 ) => {
-  const account = useAccount();
-  const address = (
-    addressOrSelf === "self" ? account.address : addressOrSelf
-  ) as Address;
-
   const nativeBalance = useBalance({
     address,
     query: { enabled: currency.isNative },
@@ -26,7 +19,7 @@ export const useCurrencyAmountOf = (
     address: currency.isNative
       ? undefined
       : (currency.wrapped.address as Address),
-    args: [address],
+    args: [address!],
     query: { enabled: currency.isToken },
   });
 
