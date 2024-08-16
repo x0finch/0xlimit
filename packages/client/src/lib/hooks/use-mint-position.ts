@@ -27,11 +27,11 @@ export const useMintPosition = (
   const { sendTransactionAsync, isPending, isSuccess, error } =
     useSendTransaction();
 
-  const {
-    pool,
-    createInitialPool,
-    isLoading: isFetchingPool,
-  } = useV3Pool(inputCurrency, outputCurrency, feeAmount);
+  const { pool, isLoading: isLoadingPool } = useV3Pool(
+    inputCurrency,
+    outputCurrency,
+    feeAmount
+  );
 
   const [tickLower, tickUpper] = useTickRange(
     inputCurrency,
@@ -48,8 +48,10 @@ export const useMintPosition = (
 
     if (!chainId || !address) {
       throw new Error("No account connected");
-    } else if (isFetchingPool) {
+    } else if (isLoadingPool) {
       throw new Error("Pool is loading");
+    } else if (!pool || pool.isNotLiquidity) {
+      throw new Error("Pool is not liquidity");
     }
 
     const [currency0] = currencies.sorted(inputCurrency, outputCurrency);
@@ -57,9 +59,8 @@ export const useMintPosition = (
 
     const inputAmountBigInt = parseUnits(inputAmount, inputCurrency.decimals);
 
-    const positionPool = pool ?? createInitialPool(marketPrice);
     const position = Position.fromAmounts({
-      pool: positionPool,
+      pool,
       tickLower,
       tickUpper,
       amount0: currency0IsInput ? inputAmountBigInt.toString() : 0,
@@ -73,7 +74,7 @@ export const useMintPosition = (
         recipient: address,
         deadline,
         slippageTolerance,
-        createPool: positionPool.isNotLiquidity,
+        createPool: pool.isNotLiquidity,
         useNative: inputCurrency.isNative ? inputCurrency : undefined,
       }
     );
@@ -85,5 +86,12 @@ export const useMintPosition = (
     });
   };
 
-  return { mint, isFetchingPool, isPending, isSuccess, error: error as Error };
+  return {
+    mint,
+    pool,
+    isLoadingPool,
+    isPending,
+    isSuccess,
+    error: error as Error,
+  };
 };

@@ -7,7 +7,6 @@ import { Address } from "viem";
 import { uniswapV3PoolAbi } from "../abis/uniswap-v3-pool";
 import { prices } from "../utils";
 import { CurrencyPrice, Pool } from "../alternatives";
-import { ArrayToTuple } from "../types";
 
 export const useV3Pool = (
   currencyA: Currency,
@@ -28,7 +27,7 @@ export const useV3Pool = (
 
   const { data, isLoading, isPending, isSuccess, error, dataUpdatedAt } =
     useReadContracts({
-      allowFailure: true,
+      allowFailure: false,
       contracts: [
         {
           address: poolAddress,
@@ -44,15 +43,15 @@ export const useV3Pool = (
     });
 
   const pool = useMemo(() => {
-    if (!data || data.every((item) => item.status !== "success")) {
+    if (!data) {
       return undefined;
     }
 
-    const successData = data
-      .filter((item) => item.status === "success")
-      .map((item) => item.result);
+    // const successData = data
+    //   .filter((item) => item.status === "success")
+    //   .map((item) => item.result);
 
-    const [liquidity, slot0] = successData as ArrayToTuple<typeof successData>;
+    const [liquidity, slot0] = data;
     const [sqrtPriceX96, tick] = slot0;
 
     return new Pool(
@@ -64,13 +63,6 @@ export const useV3Pool = (
       tick
     );
   }, [currency0, currency1, feeAmount, data]);
-
-  // console.log("pool: ", {
-  //   feeAmount,
-  //   poolAddress,
-  //   pool,
-  //   isNotExist: pool?.isNotExist,
-  // });
 
   const createInitialPool = useCallback(
     (marketPrice: CurrencyPrice) => {

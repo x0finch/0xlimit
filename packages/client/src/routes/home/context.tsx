@@ -24,6 +24,9 @@ const DraftState = createContext<{
   feeAmount: FeeAmount;
   setFeeAmount: React.Dispatch<React.SetStateAction<FeeAmount>>;
 
+  transactionDeadline: number;
+  setTransactionDeadline: React.Dispatch<React.SetStateAction<number>>;
+
   toggleInputOutputCurrencies: () => void;
   toggleBaseQuoteCurrencies: () => void;
 }>({} as never);
@@ -82,8 +85,12 @@ export const DraftStateProvider: React.FC<
     inputCurrency: Currency;
     outputCurrency: Currency;
     marketPrice: CurrencyPrice;
+    feeAmount: FeeAmount;
+    setFeeAmount: React.Dispatch<React.SetStateAction<FeeAmount>>;
     toggleInputOutputCurrencies: () => void;
     toggleBaseQuoteCurrencies: () => void;
+    transactionDeadline: number;
+    setTransactionDeadline: React.Dispatch<React.SetStateAction<number>>;
   }>
 > = ({
   children,
@@ -92,11 +99,15 @@ export const DraftStateProvider: React.FC<
   marketPrice,
   toggleInputOutputCurrencies: toggleInputOutputCurrenciesOuter,
   toggleBaseQuoteCurrencies: toggleBaseQuoteCurrenciesOuter,
+  feeAmount,
+  setFeeAmount,
+  transactionDeadline,
+  setTransactionDeadline,
 }) => {
   const [inputPrice, setInputPrice] = useState<Decimal | null>(null);
   const [inputAmount, setInputAmount] = useState<Decimal>("");
   const [outputAmount, setOutputAmount] = useState<Decimal>("");
-  const [feeAmount, setFeeAmount] = useState<FeeAmount>(FeeAmount.LOW);
+  // const [feeAmount, setFeeAmount] = useState<FeeAmount>(FeeAmount.LOW);
 
   const [priceBaseOnInput, priceBaseOnOutput] = useMemo(
     () => rebasePrice(marketPrice, inputPrice, inputCurrency),
@@ -187,6 +198,9 @@ export const DraftStateProvider: React.FC<
 
         toggleInputOutputCurrencies,
         toggleBaseQuoteCurrencies,
+
+        transactionDeadline,
+        setTransactionDeadline,
       }}
     >
       {children}

@@ -39,6 +39,10 @@ const _Connector: React.FC<React.PropsWithChildren<unknown>> = ({
     isLoading,
     error,
     setMarketPrice,
+    feeAmount,
+    setFeeAmount,
+    transactionDeadline,
+    setTransactionDeadline,
   } = useConnector();
 
   const toggleInputOutputCurrencies = () => {
@@ -76,6 +80,10 @@ const _Connector: React.FC<React.PropsWithChildren<unknown>> = ({
         marketPrice={marketPrice}
         toggleInputOutputCurrencies={toggleInputOutputCurrencies}
         toggleBaseQuoteCurrencies={toggleBaseQuoteCurrencies}
+        feeAmount={feeAmount}
+        setFeeAmount={setFeeAmount}
+        transactionDeadline={transactionDeadline}
+        setTransactionDeadline={setTransactionDeadline}
       >
         {children}
       </DraftStateProvider>
@@ -87,7 +95,6 @@ const Mask: React.FC<
   React.PropsWithChildren<{ isLoading: boolean; error: Error | null }>
 > = ({ children, isLoading, error }) => {
   const enabled = isLoading || !!error;
-  console.log("mask: ", { isLoading, error });
 
   return (
     <div className="relative">

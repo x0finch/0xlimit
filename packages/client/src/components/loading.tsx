@@ -1,5 +1,5 @@
 import { cn } from "@shadcn/utils";
-import { Spinner } from "./icons/spinner";
+import { SpinnerIcon } from "./icons/spinner";
 
 export const Loading: React.FC<{ className?: string }> = ({ className }) => {
   return (
@@ -9,7 +9,7 @@ export const Loading: React.FC<{ className?: string }> = ({ className }) => {
         className
       )}
     >
-      <Spinner className="h-4 w-4 animate-spin" />
+      <SpinnerIcon />
       Loading...
     </div>
   );

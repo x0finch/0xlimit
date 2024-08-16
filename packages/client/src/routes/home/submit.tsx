@@ -84,7 +84,7 @@ const ConfirmButton = () => {
     inputCurrencyAmount
   );
 
-  const { mint, isFetchingPool } = useMintPosition(
+  const { mint, isLoadingPool, pool } = useMintPosition(
     inputCurrency,
     outputCurrency,
     inputAmount,
@@ -104,31 +104,45 @@ const ConfirmButton = () => {
     onInputAmountChange("");
   };
 
-  const isPreparing = isFetchingPool;
-  const isConfirmDisabled =
-    isPreparing || !isEnoughBalance || !isInputPositiveAmount;
+  const isLoading = isLoadingPool;
+  const isPoolNotLiquidity = pool?.isNotLiquidity ?? true;
 
-  const text = useMemo(() => {
+  const [text, enabled, showWarning] = useMemo(() => {
     switch (true) {
-      case isPreparing:
-        return "Loading...";
-      case !isEnoughBalance:
-        return `Insufficient ${inputCurrency.symbol} Balance`;
-      case !hasApproved:
-        return `Approve ${inputCurrency.symbol}`;
+      case isLoading:
+        return ["Loading...", false, false];
 
-      case hasApproved:
-        return "Confirm";
+      case isPoolNotLiquidity:
+        return ["Pool is not liquidity", false, true];
+
+      case !isInputPositiveAmount:
+        return ["Please input amount", false, false];
+
+      case !isEnoughBalance:
+        return [`Insufficient ${inputCurrency.symbol} Balance`, false, true];
+
+      case !hasApproved:
+        return ["Approve ${inputCurrency.symbol}", false, false];
+
+      default:
+        return ["Confirm", true, false];
     }
-  }, [isPreparing, isEnoughBalance, hasApproved, inputCurrency.symbol]);
+  }, [
+    isLoading,
+    isPoolNotLiquidity,
+    isInputPositiveAmount,
+    isEnoughBalance,
+    hasApproved,
+    inputCurrency.symbol,
+  ]);
 
   return (
     <Button
       className={cn(
-        "w-full h-12 rounded-2xl bg-primary",
-        !isPreparing && !isEnoughBalance && "bg-red-500"
+        "w-full h-12 rounded-2xl bg-primary capitalize",
+        showWarning && "bg-red-500"
       )}
-      disabled={isConfirmDisabled}
+      disabled={!enabled}
       onClick={onConfirm}
     >
       {text}

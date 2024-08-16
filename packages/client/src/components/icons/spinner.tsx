@@ -1,6 +1,10 @@
+import { cn } from "@shadcn/utils";
 import React from "react";
 
-export const Spinner = (props: React.HTMLAttributes<SVGElement>) => {
+export const SpinnerIcon = ({
+  className,
+  ...props
+}: React.HTMLAttributes<SVGElement>) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -12,6 +16,7 @@ export const Spinner = (props: React.HTMLAttributes<SVGElement>) => {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      className={cn("h-4 w-4 animate-spin", className)}
       {...props}
     >
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />

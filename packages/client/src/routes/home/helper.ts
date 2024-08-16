@@ -163,12 +163,14 @@ export const useConnector = () => {
   const [marketPrice, setMarketPrice] = useState<CurrencyPrice>(() =>
     prices.from(inputCurrency, outputCurrency, 1)
   );
+  const [feeAmount, setFeeAmount] = useState<FeeAmount>(FeeAmount.LOW);
+  const [transactionDeadline, setTransactionDeadline] = useState<number>(20);
 
   const {
     pool,
     error: poolError,
     isLoading: isPoolLoading,
-  } = useV3Pool(inputCurrency, outputCurrency, FeeAmount.LOW);
+  } = useV3Pool(inputCurrency, outputCurrency, feeAmount);
 
   useEffect(() => {
     if (!pool) {
@@ -228,10 +230,14 @@ export const useConnector = () => {
     inputCurrency,
     outputCurrency,
     marketPrice,
+    feeAmount,
     isLoading,
     error,
     setMarketPrice,
     setInputCurrency,
     setOutputCurrency,
+    setFeeAmount,
+    transactionDeadline,
+    setTransactionDeadline,
   };
 };
