@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { Navbar } from "~/components/nav-bar";
+import { Analytics } from "@vercel/analytics/react";
 
 const Root = () => {
   return (
@@ -8,6 +9,7 @@ const Root = () => {
       <main className="flex-1">
         <Outlet />
       </main>
+      <Analytics />
     </div>
   );
 };
