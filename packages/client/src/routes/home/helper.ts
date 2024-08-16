@@ -170,7 +170,7 @@ export const useConnector = () => {
     pool,
     error: poolError,
     isLoading: isPoolLoading,
-  } = useV3Pool(inputCurrency, outputCurrency, feeAmount);
+  } = useV3Pool(inputCurrency, outputCurrency, feeAmount, 10 * 1e3);
 
   useEffect(() => {
     if (!pool) {

@@ -1,5 +1,6 @@
 {
-  "name": "maker",
+  "name": "0xlimit",
+  "description": "A Limit Order Application Powered By Uniswap Liquidity V3",
   "version": "1.0.0",
   "scripts": {
     "test": "pnpm -r --filter='./packages/*' run test",
@@ -7,8 +8,9 @@
     "client": "pnpm -r --filter='client' pnpm"
   },
   "keywords": [
-    "uniswap v3",
-    "liquidity",
-    "maker"
+    "limit order",
+    "uniswap liquidity v3",
+    "no slippage",
+    "no fees but earn fees"
   ]
 }

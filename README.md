@@ -1,1 +1,3 @@
-# Uniswap V3 Maker
+# 0xLimit
+
+A Limit Order Application Powered by Uniswap Liquidity V3

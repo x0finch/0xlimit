@@ -15,7 +15,9 @@ export const Navbar = () => {
       <div className="container flex h-12 max-w-screen-2xl items-center px-4">
         <div className="flex items-center space-x-4">
           <img src="/logo.png" alt="Logo" className="h-8 w-8" />
-          <span className="text-xl font-bold">Uniswap V3 Maker</span>
+          <span className="text-xl font-bold flex flex-row items-start">
+            0xLimit
+          </span>
         </div>
 
         <div className="flex flex-1 space-x-2 justify-end items-center">

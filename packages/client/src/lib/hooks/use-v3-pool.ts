@@ -11,7 +11,8 @@ import { CurrencyPrice, Pool } from "../alternatives";
 export const useV3Pool = (
   currencyA: Currency,
   currencyB: Currency,
-  feeAmount: FeeAmount
+  feeAmount: FeeAmount,
+  refetchInterval?: number
 ) => {
   const [currency0, currency1] = useSortedCurrencies(currencyA, currencyB);
 
@@ -40,16 +41,15 @@ export const useV3Pool = (
           functionName: "slot0",
         },
       ],
+      query: {
+        refetchInterval,
+      },
     });
 
   const pool = useMemo(() => {
     if (!data) {
       return undefined;
     }
-
-    // const successData = data
-    //   .filter((item) => item.status === "success")
-    //   .map((item) => item.result);
 
     const [liquidity, slot0] = data;
     const [sqrtPriceX96, tick] = slot0;

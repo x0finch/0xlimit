@@ -10,7 +10,8 @@ const config = createConfig(
     client({ chain }) {
       return createClient({ chain, transport: http() });
     },
-    appName: "Maker",
+    appName: "0xLimit",
+    appDescription: "A Limit Order Application Powered By Uniswap Liquidity V3",
     walletConnectProjectId: "",
   })
 );
