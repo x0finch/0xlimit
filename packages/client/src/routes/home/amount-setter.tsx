@@ -1,7 +1,7 @@
 import { Button } from "@shadcn/components/ui/button";
 import { Card } from "@shadcn/components/ui/card";
 import { DecimalInput } from "~/components/decimal-input";
-import { TokenBadge } from "~/components/token/token.badge";
+import { TokenBadge } from "~/components/token/token-badge";
 import { useDraftState } from "./context";
 import { ChevronDownIcon, SymbolIcon } from "@radix-ui/react-icons";
 import { cn } from "@shadcn/utils";

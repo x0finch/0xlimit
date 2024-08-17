@@ -1,6 +1,6 @@
 import { Button } from "@shadcn/components/ui/button";
 import { Card } from "@shadcn/components/ui/card";
-import { TokenBadge } from "~/components/token/token.badge";
+import { TokenBadge } from "~/components/token/token-badge";
 import { useDraftState } from "./context";
 import { useMemo } from "react";
 import { SymbolIcon, Cross2Icon } from "@radix-ui/react-icons";

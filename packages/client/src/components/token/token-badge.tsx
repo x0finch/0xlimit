@@ -1,13 +1,13 @@
 import { Currency } from "@uniswap/sdk-core";
-import { TokenAvatar } from "./token.avatar";
+import { TokenAvatar } from "./token-avatar";
 import { cn } from "@shadcn/utils";
 
 export const TokenBadge: React.FC<{
-  children: Currency | null | undefined;
+  children: Currency;
   avatarSize?: string | number;
   className?: string;
-}> = ({ children: token, avatarSize, className }) => {
-  const symbol = token?.symbol ?? "Unknown";
+}> = ({ children: currency, avatarSize, className }) => {
+  const symbol = currency?.symbol ?? "Unknown";
 
   return (
     <div
@@ -16,7 +16,7 @@ export const TokenBadge: React.FC<{
         className
       )}
     >
-      <TokenAvatar size={avatarSize}>{token}</TokenAvatar>
+      <TokenAvatar size={avatarSize}>{currency}</TokenAvatar>
       <span className="text-primary font-medium">{symbol}</span>
     </div>
   );
