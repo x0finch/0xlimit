@@ -3,6 +3,7 @@ import { AmountSetter } from "./amount-setter";
 import { Details } from "./details";
 import { Submit } from "./submit";
 import { Header } from "./header";
+import { Comment } from "./comment";
 
 export const LimitOrderCreator = () => {
   return (
@@ -12,6 +13,7 @@ export const LimitOrderCreator = () => {
       <AmountSetter />
       <Submit />
       <Details />
+      <Comment />
     </div>
   );
 };
