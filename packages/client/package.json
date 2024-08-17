@@ -34,6 +34,7 @@
     "react-router-dom": "^6.25.1",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
+    "use-local-storage": "^3.0.0",
     "viem": "2.x",
     "wagmi": "^2.12.5"
   },

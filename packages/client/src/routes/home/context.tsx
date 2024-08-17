@@ -22,10 +22,10 @@ const DraftState = createContext<{
   onOutputAmountChange: (value: Decimal) => void;
 
   feeAmount: FeeAmount;
-  setFeeAmount: React.Dispatch<React.SetStateAction<FeeAmount>>;
+  setFeeAmount: (value: FeeAmount) => void;
 
   transactionDeadline: number;
-  setTransactionDeadline: React.Dispatch<React.SetStateAction<number>>;
+  setTransactionDeadline: (value: number) => void;
 
   toggleInputOutputCurrencies: () => void;
   toggleBaseQuoteCurrencies: () => void;
@@ -86,11 +86,11 @@ export const DraftStateProvider: React.FC<
     outputCurrency: Currency;
     marketPrice: CurrencyPrice;
     feeAmount: FeeAmount;
-    setFeeAmount: React.Dispatch<React.SetStateAction<FeeAmount>>;
+    setFeeAmount: (value: FeeAmount) => void;
     toggleInputOutputCurrencies: () => void;
     toggleBaseQuoteCurrencies: () => void;
     transactionDeadline: number;
-    setTransactionDeadline: React.Dispatch<React.SetStateAction<number>>;
+    setTransactionDeadline: (value: number) => void;
   }>
 > = ({
   children,

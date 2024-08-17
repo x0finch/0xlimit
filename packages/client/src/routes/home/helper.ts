@@ -13,6 +13,7 @@ import { useChainId } from "wagmi";
 import { useSearchParams } from "react-router-dom";
 import { useV3Pool } from "~/lib/hooks/use-v3-pool";
 import { CurrencyPrice } from "~/lib/alternatives";
+import useLocalStorage from "use-local-storage";
 
 export const INPUT_CURRENCY_KEY = "in";
 export const OUTPUT_CURRENCY_KEY = "out";
@@ -153,6 +154,12 @@ export const useConnector = () => {
     OUTPUT_CURRENCY_KEY
   ) as UserCurrencyId;
 
+  const [feeAmount, setFeeAmount] = useLocalStorage("feeAmount", FeeAmount.LOW);
+  const [transactionDeadline, setTransactionDeadline] = useLocalStorage(
+    "transactionDeadline",
+    20
+  );
+
   const chainId = useChainId();
   const [inputCurrency, setInputCurrency] = useState<Currency>(() =>
     createInitCurrency(chainId, userInputCurrencyId)
@@ -163,8 +170,6 @@ export const useConnector = () => {
   const [marketPrice, setMarketPrice] = useState<CurrencyPrice>(() =>
     prices.from(inputCurrency, outputCurrency, 1)
   );
-  const [feeAmount, setFeeAmount] = useState<FeeAmount>(FeeAmount.LOW);
-  const [transactionDeadline, setTransactionDeadline] = useState<number>(20);
 
   const {
     pool,
