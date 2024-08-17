@@ -9,6 +9,11 @@ import { Decimal } from "~/lib/utils";
 import { Currency } from "@uniswap/sdk-core";
 import { useCurrencyAmountOf } from "~/lib/hooks/use-currency-amount-of";
 import { useAccount } from "wagmi";
+import { SelectTokenDialog } from "~/components/select-token-dialog";
+import { ConnectedSelectTokenDialog } from "./connected-select-token-dialog";
+import { useSearchParams } from "react-router-dom";
+import { NATIVE_TOKEN_INFO } from "~/lib/constants";
+import { INPUT_CURRENCY_KEY, OUTPUT_CURRENCY_KEY } from "./helper";
 
 export const AmountSetter = () => {
   return (
@@ -22,6 +27,7 @@ export const AmountSetter = () => {
 
 const AmountInput = () => {
   const { inputCurrency, inputAmount, onInputAmountChange } = useDraftState();
+  const [, setSearchParams] = useSearchParams();
 
   return (
     <Card className="w-full bg-accent flex flex-col p-4 rounded-2xl border-none shadow-none h-[120px] overflow-clip">
@@ -35,12 +41,26 @@ const AmountInput = () => {
           value={inputAmount}
           onChange={onInputAmountChange}
         />
-        <Button variant="outline" className="rounded-full h-8 pl-1 pr-2 py-0">
-          <TokenBadge avatarSize="1.5rem" className="text-lg">
-            {inputCurrency}
-          </TokenBadge>
-          <ChevronDownIcon className="ml-1" />
-        </Button>
+        <ConnectedSelectTokenDialog
+          onSelect={({ address }) => {
+            const isNative = address === NATIVE_TOKEN_INFO.address;
+
+            setSearchParams((prev) => {
+              prev.set(
+                INPUT_CURRENCY_KEY,
+                isNative ? NATIVE_TOKEN_INFO.symbol : address
+              );
+              return prev;
+            });
+          }}
+        >
+          <Button variant="outline" className="rounded-full h-8 pl-1 pr-2 py-0">
+            <TokenBadge avatarSize="1.5rem" className="text-lg">
+              {inputCurrency}
+            </TokenBadge>
+            <ChevronDownIcon className="ml-1" />
+          </Button>
+        </ConnectedSelectTokenDialog>
       </div>
       <Balance showMax onAmountChange={onInputAmountChange}>
         {inputCurrency}
@@ -63,6 +83,7 @@ const CenterInvert = () => {
 };
 
 const AmountOutput = () => {
+  const [, setSearchParams] = useSearchParams();
   const { outputCurrency, outputAmount, onOutputAmountChange } =
     useDraftState();
 
@@ -78,12 +99,26 @@ const AmountOutput = () => {
           value={outputAmount}
           onChange={onOutputAmountChange}
         />
-        <Button variant="outline" className="rounded-full h-8 pl-1 pr-2 py-0">
-          <TokenBadge avatarSize="1.5rem" className="text-lg">
-            {outputCurrency}
-          </TokenBadge>
-          <ChevronDownIcon className="ml-1" />
-        </Button>
+        <ConnectedSelectTokenDialog
+          onSelect={({ address }) => {
+            const isNative = address === NATIVE_TOKEN_INFO.address;
+
+            setSearchParams((prev) => {
+              prev.set(
+                OUTPUT_CURRENCY_KEY,
+                isNative ? NATIVE_TOKEN_INFO.symbol : address
+              );
+              return prev;
+            });
+          }}
+        >
+          <Button variant="outline" className="rounded-full h-8 pl-1 pr-2 py-0">
+            <TokenBadge avatarSize="1.5rem" className="text-lg">
+              {outputCurrency}
+            </TokenBadge>
+            <ChevronDownIcon className="ml-1" />
+          </Button>
+        </ConnectedSelectTokenDialog>
       </div>
       <Balance>{outputCurrency}</Balance>
     </Card>

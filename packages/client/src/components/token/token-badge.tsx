@@ -1,5 +1,5 @@
 import { Currency } from "@uniswap/sdk-core";
-import { TokenAvatar } from "./token-avatar";
+import { CurrencyAvatar } from "./token-avatar";
 import { cn } from "@shadcn/utils";
 
 export const TokenBadge: React.FC<{
@@ -16,7 +16,7 @@ export const TokenBadge: React.FC<{
         className
       )}
     >
-      <TokenAvatar size={avatarSize}>{currency}</TokenAvatar>
+      <CurrencyAvatar size={avatarSize}>{currency}</CurrencyAvatar>
       <span className="text-primary font-medium">{symbol}</span>
     </div>
   );

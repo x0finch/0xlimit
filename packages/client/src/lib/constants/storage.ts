@@ -3,8 +3,8 @@ const PREFIX = "0xlimit";
 const STORAGE_KEYS = {
   FEE_AMOUNT: "feeAmount",
   TRANSACTION_DEADLINE: "transactionDeadline",
-  TOKEN_LIST: "tokenList",
-  TOKEN_LIST_LAST_MODIFIED: "tokenListLastModified",
+  TOKEN_INFO_LIST: "tokenInfoList",
+  TOKEN_INFO_LIST_LAST_MODIFIED: "tokenInfoListLastModified",
 };
 
 export type StorageID = keyof typeof STORAGE_KEYS;

@@ -1,4 +1,3 @@
-export * from "./tokens";
+export * from "./currencies";
 export * from "./storage";
 export type * from "./storage";
-export * from "./token-list";

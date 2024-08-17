@@ -1,4 +1,4 @@
-import { Currency, Ether, Token } from "@uniswap/sdk-core";
+import { Currency } from "@uniswap/sdk-core";
 import { createContext, useContext, useMemo, useState } from "react";
 import { Decimal, prices } from "~/lib/utils";
 import { FeeAmount } from "@uniswap/v3-sdk";
@@ -30,32 +30,6 @@ const DraftState = createContext<{
   toggleInputOutputCurrencies: () => void;
   toggleBaseQuoteCurrencies: () => void;
 }>({} as never);
-
-const eth = Ether.onChain(1);
-// const weth = new Token(
-//   1,
-//   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-//   18,
-//   "ETH"
-// );
-// const usdc = new Token(
-//   1,
-//   "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-//   6,
-//   "USDC"
-// );
-const usdt = new Token(
-  1,
-  "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-  6,
-  "USDT"
-);
-const wbtc = new Token(
-  1,
-  "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
-  8,
-  "WBTC"
-);
 
 const rebasePrice = (
   marketPrice: CurrencyPrice,
