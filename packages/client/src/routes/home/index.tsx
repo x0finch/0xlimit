@@ -3,6 +3,7 @@ import { useChainId } from "wagmi";
 import { LimitOrderCreator } from "./limit-order-creator";
 import { fixPair, INPUT_CURRENCY_KEY, OUTPUT_CURRENCY_KEY } from "./helper";
 import { Connector } from "./connector";
+import { Landing } from "./landing";
 
 const Redirect: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => {
   const chainId = useChainId();
@@ -41,6 +42,7 @@ const Home = () => {
           <LimitOrderCreator />
         </Connector>
       </div>
+      <Landing />
     </Redirect>
   );
 };
