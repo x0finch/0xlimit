@@ -7,7 +7,7 @@ import { Comment } from "./comment";
 
 export const LimitOrderCreator = () => {
   return (
-    <div className="w-full max-w-[420px] flex flex-col items-center gap-y-1">
+    <div className="w-full max-w-[420px] flex flex-col items-center gap-y-1 px-3">
       <Header />
       <PriceSetter />
       <AmountSetter />
