@@ -37,7 +37,7 @@ const Redirect: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => {
 const Home = () => {
   return (
     <Redirect>
-      <div className="flex justify-center mt-8">
+      <div className="flex justify-center mt-12">
         <Connector>
           <LimitOrderCreator />
         </Connector>
